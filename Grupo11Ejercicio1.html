@@ -1,0 +1,682 @@
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Juego de Tablas de Multiplicar</title>
+    <style>
+        :root {
+        --color-primary: #ff6f61;
+        --color-secondary: #4caf50;
+        --color-bg: linear-gradient(to bottom, #ffecd2, #fcb69f);
+        --color-box: #fff8dc;
+        --color-text: #333;
+        --color-accent: #e91e63;
+        --color-success: #2196f3;
+        --color-warning: #ff9800;
+        }
+
+        body {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background: var(--color-bg);
+        text-align: center;
+        padding: 20px;
+        color: var(--color-text);
+        min-height: 100vh;
+        transition: background 0.5s;
+        }
+
+        h1 {
+        font-size: 2.5em;
+        color: var(--color-primary);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+        }
+
+        .difficulty-selector {
+        margin: 15px 0;
+        }
+
+        .difficulty-btn {
+        padding: 8px 15px;
+        margin: 0 5px;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.3s;
+        }
+
+        .difficulty-btn.active {
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .easy {
+        background-color: #a5d6a7;
+        }
+
+        .medium {
+        background-color: #ffe082;
+        }
+
+        .hard {
+        background-color: #ef9a9a;
+        }
+
+        .animal-banner {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 20px 0;
+        animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        }
+
+        .animal-banner img {
+        height: 80px;
+        transition: transform 0.3s;
+        }
+
+        .animal-banner img:hover {
+        transform: scale(1.1) rotate(10deg);
+        }
+
+        .game-box {
+        background-color: var(--color-box);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden;
+        }
+
+        .timer-container {
+        height: 10px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        }
+
+        .timer-bar {
+        height: 100%;
+        background-color: var(--color-primary);
+        width: 100%;
+        transition: width 1s linear;
+        }
+
+        .question {
+        font-size: 1.8em;
+        margin: 20px 0;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        input[type="number"] {
+        font-size: 1.2em;
+        padding: 12px;
+        border-radius: 10px;
+        border: 3px solid var(--color-primary);
+        width: 120px;
+        text-align: center;
+        transition: all 0.3s;
+        }
+
+        input[type="number"]:focus {
+        border-color: var(--color-secondary);
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        outline: none;
+        }
+
+        .input-container {
+        position: relative;
+        display: inline-block;
+        }
+
+        .input-container::after {
+        content: '?';
+        position: absolute;
+        right: -25px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5em;
+        color: var(--color-primary);
+        }
+
+        button {
+        margin-top: 20px;
+        padding: 12px 30px;
+        background-color: var(--color-secondary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+        background-color: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+        transform: translateY(0);
+        }
+
+        button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        }
+
+        .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+        }
+
+        .stat-box {
+        background-color: white;
+        padding: 10px 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        min-width: 80px;
+        }
+
+        .points {
+        font-size: 1.3em;
+        color: var(--color-accent);
+        font-weight: bold;
+        }
+
+        .lives {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 10px;
+        }
+
+        .life {
+        width: 25px;
+        height: 25px;
+        background-color: var(--color-accent);
+        border-radius: 50%;
+        display: inline-block;
+        }
+
+        .life.lost {
+        background-color: #cccccc;
+        }
+
+        .footer-animals {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 40px;
+        }
+
+        .footer-animals img {
+        height: 60px;
+        transition: transform 0.3s;
+        }
+
+        .footer-animals img:hover {
+        transform: scale(1.1);
+        }
+
+        .message {
+        font-size: 1.5em;
+        margin-top: 20px;
+        min-height: 40px;
+        animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+        }
+
+        .correct {
+        color: var(--color-success);
+        }
+
+        .incorrect {
+        color: var(--color-warning);
+        }
+
+        .celebration {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        display: none;
+        }
+
+        .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #f00;
+        opacity: 0.8;
+        animation: confettiFall 5s linear forwards;
+        }
+
+        @keyframes confettiFall {
+        to {
+            transform: translateY(100vh) rotate(720deg);
+        }
+        }
+
+        .progress-container {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        margin: 20px 0;
+        }
+
+        .progress-bar {
+        height: 20px;
+        background-color: var(--color-success);
+        border-radius: 5px;
+        width: 0%;
+        transition: width 0.5s;
+        }
+
+        .high-score {
+        margin-top: 10px;
+        font-size: 1.1em;
+        color: var(--color-accent);
+        }
+
+        @media (max-width: 500px) {
+        .game-box {
+            padding: 20px;
+        }
+        
+        .question {
+            font-size: 1.5em;
+        }
+        
+        .animal-banner img, .footer-animals img {
+            height: 50px;
+        }
+        }
+    </style>
+    </head>
+    <body>
+    <h1>¡Juego de Tablas de Multiplicar!</h1>
+
+    <div class="difficulty-selector">
+        <button class="difficulty-btn easy active" onclick="setDifficulty('easy')">Fácil (1-5)</button>
+        <button class="difficulty-btn medium" onclick="setDifficulty('medium')">Medio (1-10)</button>
+        <button class="difficulty-btn hard" onclick="setDifficulty('hard')">Difícil (1-12)</button>
+    </div>
+
+    <div class="animal-banner">
+        <!-- Nuevos iconos de animales en el banner superior -->
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069172.png" alt="Panda">
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069196.png" alt="Tucán">
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069224.png" alt="Cocodrilo">
+    </div>
+
+    <div class="game-box">
+        <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+        </div>
+        
+        <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="question" id="pregunta">¿Preparado para jugar?</div>
+        
+        <div class="input-container">
+        <input type="number" id="respuesta" placeholder="Tu respuesta" autofocus />
+        </div>
+        
+        <br>
+        <button onclick="verificarRespuesta()" id="responderBtn">Responder</button>
+        
+        <div class="stats">
+        <div class="stat-box">
+            <div>Puntos</div>
+            <div class="points" id="puntos">0</div>
+        </div>
+        <div class="stat-box">
+            <div>Vidas</div>
+            <div class="lives" id="vidas">
+            <div class="life"></div>
+            <div class="life"></div>
+            <div class="life"></div>
+            </div>
+        </div>
+        </div>
+        
+        <div class="high-score" id="highScore">Mejor puntuación: 0</div>
+        
+        <div class="message" id="mensaje"></div>
+    </div>
+
+    <div class="footer-animals">
+        <!-- Nuevos iconos de animales en el footer -->
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069256.png" alt="Pulpo">
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069231.png" alt="Delfín">
+        <img src="https://cdn-icons-png.flaticon.com/512/3069/3069203.png" alt="Pez payaso">
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+
+    <script>
+        // Variables del juego
+        let puntos = 0;
+        let vidas = 3;
+        let num1, num2;
+        let dificultad = 'easy';
+        let timer;
+        let timeLeft = 10;
+        let maxTime = 10;
+        let highScore = localStorage.getItem('multiplicationHighScore') || 0;
+        let targetScore = 30;
+        let gameActive = false;
+
+        // Elementos del DOM
+        const preguntaEl = document.getElementById('pregunta');
+        const respuestaEl = document.getElementById('respuesta');
+        const puntosEl = document.getElementById('puntos');
+        const mensajeEl = document.getElementById('mensaje');
+        const vidasEl = document.getElementById('vidas');
+        const timerBarEl = document.getElementById('timerBar');
+        const progressBarEl = document.getElementById('progressBar');
+        const highScoreEl = document.getElementById('highScore');
+        const celebrationEl = document.getElementById('celebration');
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const winSound = document.getElementById('winSound');
+        const responderBtn = document.getElementById('responderBtn');
+
+        // Inicializar el juego
+        function initGame() {
+        highScoreEl.textContent = `Mejor puntuación: ${highScore}`;
+        respuestaEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+            verificarRespuesta();
+            }
+        });
+        }
+
+        // Configurar dificultad
+        function setDifficulty(level) {
+        dificultad = level;
+        
+        // Actualizar botones activos
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`.difficulty-btn.${level}`).classList.add('active');
+        
+        // Configurar tiempo según dificultad
+        if (level === 'easy') {
+            maxTime = 15;
+            targetScore = 20;
+        } else if (level === 'medium') {
+            maxTime = 10;
+            targetScore = 30;
+        } else {
+            maxTime = 7;
+            targetScore = 40;
+        }
+        
+        // Reiniciar juego si ya estaba activo
+        if (gameActive) {
+            resetGame();
+            nuevaPregunta();
+        }
+        }
+
+        // Generar nueva pregunta
+        function nuevaPregunta() {
+        gameActive = true;
+        
+        let maxNum;
+        if (dificultad === 'easy') {
+            maxNum = 5;
+        } else if (dificultad === 'medium') {
+            maxNum = 10;
+        } else {
+            maxNum = 12;
+        }
+        
+        num1 = Math.floor(Math.random() * maxNum) + 1;
+        num2 = Math.floor(Math.random() * maxNum) + 1;
+        
+        preguntaEl.textContent = `¿Cuánto es ${num1} × ${num2}?`;
+        respuestaEl.value = '';
+        respuestaEl.focus();
+        mensajeEl.textContent = '';
+        mensajeEl.className = 'message';
+        
+        // Reiniciar temporizador
+        resetTimer();
+        startTimer();
+        
+        // Actualizar barra de progreso
+        updateProgress();
+        }
+
+        // Verificar respuesta
+        function verificarRespuesta() {
+        if (!gameActive) return;
+        
+        clearInterval(timer);
+        const respuesta = parseInt(respuestaEl.value);
+        
+        if (isNaN(respuesta)) {
+            mensajeEl.textContent = 'Por favor ingresa un número';
+            mensajeEl.className = 'message incorrect';
+            startTimer();
+            return;
+        }
+        
+        if (respuesta === num1 * num2) {
+            // Respuesta correcta
+            puntos += 5;
+            puntosEl.textContent = puntos;
+            mensajeEl.textContent = '¡Correcto! 🎉';
+            mensajeEl.className = 'message correct';
+            correctSound.play();
+            
+            // Animación para respuesta correcta
+            preguntaEl.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+            preguntaEl.style.transform = 'scale(1)';
+            }, 300);
+        } else {
+            // Respuesta incorrecta
+            mensajeEl.textContent = `¡Ups! Era ${num1 * num2}. Sigue intentando 💪`;
+            mensajeEl.className = 'message incorrect';
+            wrongSound.play();
+            perderVida();
+        }
+        
+        // Verificar si ganó
+        if (puntos >= targetScore) {
+            ganarJuego();
+            return;
+        }
+        
+        // Verificar si aún tiene vidas
+        if (vidas <= 0) {
+            terminarJuego();
+            return;
+        }
+        
+        // Siguiente pregunta después de un breve retraso
+        setTimeout(nuevaPregunta, 1500);
+        }
+
+        // Perder una vida
+        function perderVida() {
+        vidas--;
+        const lifeIcons = vidasEl.children;
+        
+        // Actualizar visualización de vidas
+        for (let i = 0; i < lifeIcons.length; i++) {
+            if (i >= vidas) {
+            lifeIcons[i].classList.add('lost');
+            }
+        }
+        }
+
+        // Ganar el juego
+        function ganarJuego() {
+        gameActive = false;
+        mensajeEl.textContent = `🎉 ¡Felicidades! Has ganado con ${puntos} puntos 🎉`;
+        winSound.play();
+        crearConfeti();
+        responderBtn.disabled = true;
+        respuestaEl.disabled = true;
+        
+        // Actualizar puntuación máxima
+        if (puntos > highScore) {
+            highScore = puntos;
+            localStorage.setItem('multiplicationHighScore', highScore);
+            highScoreEl.textContent = `¡Nuevo récord! ${highScore}`;
+        }
+        }
+
+        // Terminar juego (sin vidas)
+        function terminarJuego() {
+        gameActive = false;
+        mensajeEl.textContent = `Juego terminado. Puntuación: ${puntos}`;
+        responderBtn.disabled = true;
+        respuestaEl.disabled = true;
+        
+        // Actualizar puntuación máxima
+        if (puntos > highScore) {
+            highScore = puntos;
+            localStorage.setItem('multiplicationHighScore', highScore);
+            highScoreEl.textContent = `¡Nuevo récord! ${highScore}`;
+        }
+        }
+
+        // Reiniciar juego
+        function resetGame() {
+        clearInterval(timer);
+        puntos = 0;
+        vidas = 3;
+        puntosEl.textContent = '0';
+        mensajeEl.textContent = '';
+        responderBtn.disabled = false;
+        respuestaEl.disabled = false;
+        
+        // Resetear vidas visuales
+        const lifeIcons = vidasEl.children;
+        for (let i = 0; i < lifeIcons.length; i++) {
+            lifeIcons[i].classList.remove('lost');
+        }
+        
+        updateProgress();
+        }
+
+        // Temporizador
+        function startTimer() {
+        timeLeft = maxTime;
+        updateTimerDisplay();
+        
+        timer = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft <= 0) {
+            clearInterval(timer);
+            mensajeEl.textContent = `¡Tiempo! La respuesta era ${num1 * num2}`;
+            mensajeEl.className = 'message incorrect';
+            wrongSound.play();
+            perderVida();
+            
+            if (vidas <= 0) {
+                terminarJuego();
+            } else {
+                setTimeout(nuevaPregunta, 1500);
+            }
+            }
+        }, 1000);
+        }
+
+        function resetTimer() {
+        clearInterval(timer);
+        timeLeft = maxTime;
+        updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+        const percentage = (timeLeft / maxTime) * 100;
+        timerBarEl.style.width = `${percentage}%`;
+        
+        // Cambiar color según tiempo restante
+        if (percentage > 50) {
+            timerBarEl.style.backgroundColor = '#4CAF50';
+        } else if (percentage > 25) {
+            timerBarEl.style.backgroundColor = '#FFC107';
+        } else {
+            timerBarEl.style.backgroundColor = '#F44336';
+        }
+        }
+
+        // Barra de progreso
+        function updateProgress() {
+        const percentage = (puntos / targetScore) * 100;
+        progressBarEl.style.width = `${Math.min(percentage, 100)}%`;
+        }
+
+        // Crear efecto de confeti
+        function crearConfeti() {
+        celebrationEl.style.display = 'block';
+        celebrationEl.innerHTML = '';
+        
+        const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+        
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = `${Math.random() * 100}vw`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = `${Math.random() * 10 + 5}px`;
+            confetti.style.height = `${Math.random() * 10 + 5}px`;
+            confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+            celebrationEl.appendChild(confetti);
+        }
+        
+        setTimeout(() => {
+            celebrationEl.style.display = 'none';
+        }, 5000);
+        }
+
+        // Iniciar el juego al cargar la página
+        window.onload = function() {
+        initGame();
+        setDifficulty('easy');
+        resetGame();
+        nuevaPregunta();
+        };
+    </script>
+    </body>
+    </html>
